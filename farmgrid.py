@@ -15,9 +15,9 @@ gameDisp=pygame.display.set_mode((dispWidth,dispHeight))
 pygame.display.set_caption("Farmville")
 clock=pygame.time.Clock()
 numOfTiles=15
-grassPic=pygame.image.load("farmvillexoxo\\Images\\grasstile.jpg")
+
 crashed= False
-tileSize=dispWidth/numOfTiles
+tileSize=int(dispWidth/numOfTiles)
 
 #grass= pygame.image.load("grass.png")
 #logo= pygame.image.load("LOGOfarm.png")
@@ -30,17 +30,24 @@ class tiles:
 		surface.blit(tile, (0,0))
 		return surface
 
-grassTile= tyleType(grassPic, tileSize)
+	grassTile= tileType("grasstile.jpg", tileSize)
 
 while not crashed: 
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				crashed=True
 		
+			#if event.key==pygame.KEYDOWN:
+
+
+
 		gameDisp.fill(backgroundGreen)
-		for i in range(numOfTiles*tileSize,tileSize):
-			for j in range(numOfTiles*tileSize,tileSize):
-				gameDisp.blit(tiles.grassTile)
+
+		for i in range(0,numOfTiles*tileSize,tileSize):
+			for j in range(0,numOfTiles*tileSize,tileSize):
+				gameDisp.blit(tiles.grassTile, (i, j))
+
+
 
 
 		pygame.display.update()
