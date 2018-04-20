@@ -6,14 +6,17 @@ from button import Button
 from farmgrid import tile
 from loops import *
 from globalvariables import *
+from pestgame import *
 
 
-pygame.display.set_caption("Farmville")
+
+
 
 exitCode = intro_loop()
 
 
 if exitCode==1:
+	# pestGameLoop()
 	startGameLoop()
 
 
