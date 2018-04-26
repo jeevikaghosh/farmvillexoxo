@@ -2,14 +2,85 @@ import pygame
 import sys
 import time 
 import random
+import math
 from button import Button
 from farmgrid import tile
 from globalvariables import *
 from pestgame import *
+from os import path 
+import shelve
 
 
 
-def intro_loop():
+def introLoop():
+	running = True
+	logoX=dispWidth/5
+	logoY=dispHeight/6-50
+	startWidth = dispWidth/5
+	startHeight = dispHeight/7
+	startX=2*dispWidth/5
+	StartY=4*dispHeight/5
+	usernameY=2*dispHeight/5
+	userButY=3*dispHeight/5-50
+	userButX=dispWidth/5+50
+	userWidth=dispWidth/2
+	userHeight=dispHeight/10
+	welcomeTextX=dispWidth/7
+	
+	username=""
+
+	while running: 
+		for event in pygame.event.get():
+			if event.type== pygame.QUIT:
+				return 0
+
+			if event.type==pygame.KEYDOWN:
+				print(str(event.key))
+				if event.key in keyDict:
+					print(True)
+
+					username+=keyDict[event.key]
+					print(username)
+
+				if event.key==8:
+					print (username,username[:-2] )
+					username=username[:-1]
+
+			gameDisp.fill(white)
+
+			welcomeText = myfont.render("Welcome to" , 6, black)
+			gameDisp.blit(welcomeText, (2*dispWidth/5-50, 20))
+			
+			usernameText = myfont.render("Type your username to begin:" , 6, black)
+			gameDisp.blit(usernameText, (startWidth, usernameY))
+
+			usernameButton=Button(green,userButX,userButY,userWidth,userHeight,gameDisp)
+			startButton = Button(green,startX,StartY,startWidth,startHeight,gameDisp)
+			startButton.addText("Start Game",black)
+
+			mouse = pygame.mouse.get_pos()
+
+			
+			if startButton.hover():
+				highlightStartButton= Button(brightGreen,startX,StartY,startWidth,startHeight,gameDisp)
+				highlightStartButton.addText("Start Game", black)
+
+			if usernameButton.hover():
+				highlightUsernameButton= Button(brightGreen,userButX,userButY,userWidth,userHeight,gameDisp)
+			
+			gameDisp.blit(scaledLogo,(logoX,logoY))
+
+			usernameText = myfont.render(username , 6, black)
+			gameDisp.blit(usernameText, (userButX+20, userButY+10))
+
+
+			if startButton.clicked():
+				return 1
+
+			pygame.display.update()
+
+
+def characterLoop():
 	running = True
 	logoX=dispWidth/5
 	startWidth = dispWidth/6
@@ -29,22 +100,22 @@ def intro_loop():
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				return 0
+
 				
 			gameDisp.fill(white)
+
+			characterText = myfont.render("Choose your Character:" , 6, black)
+			gameDisp.blit(characterText, (logoX, startHeight))
 
 			maleCharButton= Button(blue,maleCharButX,charButY,charButWidth,CharButHeight,gameDisp)
 
 			femCharButton=Button(pink,femCharButX,charButY,charButWidth,CharButHeight,gameDisp)
 
-			startButton = Button(green,startX,StartY,startWidth,startHeight,gameDisp)
-			startButton.addText("Start Game",black)
+			
 
 			mouse = pygame.mouse.get_pos()
 
-			if startButton.x+startButton.width > mouse[0] > startButton.x and startButton.y+startButton.height > mouse[1] > startButton.y:
-				highlightStartButton = Button(brightGreen,startX,StartY,startWidth,startHeight,gameDisp)
-				highlightStartButton.addText("Start Game",black)
-
+		
 			if maleCharButton.x+maleCharButton.width > mouse[0] > maleCharButton.x and maleCharButton.y+maleCharButton.height > mouse[1] > maleCharButton.y:
 				highlightmaleCharButton = Button(brightBlue,maleCharButX,charButY,charButWidth,CharButHeight,gameDisp)
 
@@ -61,35 +132,29 @@ def intro_loop():
 
 			if maleButClicked:
 				highlightmaleCharButton = Button(brightBlue,maleCharButX,charButY,charButWidth,CharButHeight,gameDisp)
-
+				return character
 			if femButClicked:
 				highlightmaleCharButton = Button(brightPink,femCharButX,charButY,charButWidth,CharButHeight,gameDisp)
-
+				return character
 
 
 			
 			gameDisp.blit(scaledFarmgirl,(femCharButX,charButY))
 			gameDisp.blit(scaledFarmboy,(maleCharButX,charButY+margin))
-			gameDisp.blit(scaledLogo,(logoX,0))
+		
 
 
-			if startButton.clicked():
-				return 1
+	
+				
 
 
 			pygame.display.update()
 
 
-def startGameLoop():
+
+def startGameLoop(character):
 	running = True
-	# self.currentImg = currentImg
-	# img=pygame.image.load(self.currentImg)
-	# scaleImage=pygame.transform.scale(img,(size,size))
-	# self.surface= pygame.Surface((size,size))
-	# self.surface.blit(scaleImage, (0,0))
-	# self.screen=screen
-	# self.screen.blit(self.surface,(self.x,self.y))
-	# self.clickedTile=False
+
 	cameraDir=None
 	cameraX=0
 	cameraY=0
@@ -97,6 +162,19 @@ def startGameLoop():
 	numOfTiles=5
 	margin=int(dispWidth/5) 
 	tileSize=int(dispWidth/6)
+
+	money=100
+	upgradeHouse=False
+	upgradeFarmhouse=False
+	buyTree=False
+	buyTree2=False
+	buyBush=False
+	buyBush2=False
+	
+	
+	
+
+	soundOn=True
 
 	gameDisp.fill(backgroundGreen)
 
@@ -114,20 +192,25 @@ def startGameLoop():
 
 	cropButtons= []
 
+	allRottenTiles = []
+
+	allBugTiles = []
+
+
+
 	cropButWidth = dispWidth/7
 	cropButHeight = dispHeight/8
 	cropButX=4.5*dispWidth/5
 	cornY=dispHeight/5+dispHeight/20
 	cabbageY=2*dispHeight/5+dispHeight/20
 	tomatoY=3*dispHeight/5+dispHeight/20
-
 	HouseX=dispWidth/3
+	saveButX=4*dispWidth/5
+	saveButY=dispHeight/15
 
 
 
-	# scaleHouse=pygame.transform.scale(house,(houseSize,houseSize))
-	# 
-	# housesurface.blit(scaleHouse, (0,0))
+
 
 	cornButton = Button(red,cropButX,cornY,cropButWidth,cropButHeight,gameDisp)
 	
@@ -142,28 +225,14 @@ def startGameLoop():
 
 	for i in range(margin,numOfTiles*tileSize,tileSize):
 		for j in range(margin,numOfTiles*tileSize-tileSize,tileSize):
-				newGrassTile = tile(tileSize, i+cameraX, j+cameraY, gameDisp, "grasstile.jpg")
+				newGrassTile = tile(tileSize, i+cameraX, j+cameraY, gameDisp, path.join(imageDir,"grasstile.jpg"))
 				allGrassTiles.append(newGrassTile)
 
-
-		
-	gameDisp.blit(scaledHouse,(HouseX,0))
-	gameDisp.blit(scaledTree2,(HouseX/10,3*dispHeight/5))
-	gameDisp.blit(scaledTree1,(HouseX/15-dispHeight/20,4*dispHeight/5-dispHeight/10))
-	gameDisp.blit(scaledbush,(HouseX,4*dispHeight/5+dispHeight/10))
-	gameDisp.blit(scaledTree1,(HouseX/10,4*dispHeight/5))
-
-
 	
-	if character=="f":
-		print("yes f")
-		gameDisp.blit(scaledFarmgirl2,(0,tomatoY))
-	if character=="m":
-		gameDisp.blit(scaledFarmboy2,(0,tomatoY))
-		print("yes m")
-
+	
 
 	while running: 
+
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
 					running=False
@@ -190,9 +259,102 @@ def startGameLoop():
 				cameraX-=5
 
 
+			
+			
+
+			houseButton = Button(backgroundGreen,HouseX,0,houseSize*2,houseSize,gameDisp)
+			treeButton = Button(backgroundGreen,0,2*dispHeight/3,houseSize,houseSize*2,gameDisp)
+			bushButton = Button(backgroundGreen,HouseX,7*dispHeight/8,houseSize,houseSize,gameDisp)
+
+
+			saveButton = Button(blue, saveButX, saveButY, cropButWidth,cropButHeight, gameDisp)
+			soundButton = Button(backgroundGreen, cropButX, 5*dispHeight/6, cropButWidth,cropButHeight, gameDisp)
+			saveButton.addText("Save Game", white)
 			mouse = pygame.mouse.get_pos()
+
+			if houseButton.hover():
+				upgradeText = myfont2.render("Upgrade House", 6, black)
+				gameDisp.blit(upgradeText, (HouseX*2,0))
+			else:
+				pygame.draw.rect(gameDisp,backgroundGreen,(HouseX*2,0,400,30))
+
+			if houseButton.clicked():
+				
+				# if money>50:
+					if upgradeHouse:
+						upgradeFarmhouse=True
+					upgradeHouse=True
+					if upgradeHouse and not upgradeFarmhouse:
+						money-=100
+
+			if treeButton.clicked():
+				
+				# if money>50:
+					if buyTree:
+						buyTree2=True
+					buyTree=True
+					
+					money-=20
+
+			if bushButton.clicked():
+				
+				# if money>50:
+					if buyBush:
+						buyBush2=True
+					buyBush=True
+					
+					money-=20
+
+
+
+
+
+			if bushButton.hover():
+				
+				upgradeText = myfont2.render("Buy another", 6, black)
+				upgradeText2 = myfont2.render("Bush", 6, black)
+				gameDisp.blit(upgradeText, (HouseX/2+20,dispHeight-50))
+				gameDisp.blit(upgradeText2, (HouseX/2+30,dispHeight-30))
+			
+			else:
+
+				pygame.draw.rect(gameDisp,backgroundGreen,(HouseX/2+20,dispHeight-50,120,300))
+
+		
+
+			if treeButton.hover():
+				
+				upgradeText = myfont2.render("Buy another", 6, black)
+				upgradeText2 = myfont2.render("Tree", 6, black)
+				gameDisp.blit(upgradeText, (HouseX/15,dispHeight/2+20))
+				gameDisp.blit(upgradeText2, (HouseX/10,4*dispHeight/7))
+			else:
+
+				pygame.draw.rect(gameDisp,backgroundGreen,(HouseX/15,dispHeight/2,120,300))
+
+		
+			
+			if soundButton.clicked():
+					print("smxk")
+					if not soundOn:
+						soundOn=True
+					elif soundOn:
+						soundOn=False
+			
+			if saveButton.hover():
+				highlightsaveButton = Button(brightBlue,saveButX, saveButY, cropButWidth,cropButHeight,gameDisp)
+				saveButton.addText("Save Game", white)
+			else:
+				saveButton=Button(blue,saveButX, saveButY, cropButWidth,cropButHeight,gameDisp)
+				saveButton.addText("Save Game", white)
+			if soundButton.hover():
+				highlightsaveButton = Button(green,cropButX, 5*dispHeight/6, cropButWidth,cropButHeight,gameDisp)
+			else:
+				soundButton=Button(backgroundGreen,cropButX, 5*dispHeight/6, cropButWidth,cropButHeight,gameDisp)
+
+
+			# gameDisp.fill(backgroundGreen)
 			if cornButton.hover():
-			# if cornButton.x+cornButton.width > mouse[0] > cornButton.x and cornButton.y+cornButton.height > mouse[1] > cornButton.y:
 				highlightcornButton = Button(orangeRed,cropButX,cornY,cropButWidth,cropButHeight,gameDisp)
 			else:
 				cornButton=Button(red,cropButX,cornY,cropButWidth,cropButHeight,gameDisp)
@@ -218,20 +380,20 @@ def startGameLoop():
 					# if not singtile.clickedTile:
 					if singtile.clicked():
 						time=pygame.time.get_ticks()
-						allFadedPloughTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, "soilfaded.png", time))
+						allFadedPloughTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, path.join(imageDir,"soilfaded.png"), time))
 						singtile.clickedTile=True
 						allGrassTiles.remove(singtile)
 						print (pygame.time.get_ticks())
 						print(allGrassTiles)
 						print("clicked tile at " + str(singtile.x) + "," + str(singtile.y)+"clicked" +str(singtile.clickedTile))
-				
+						money-=20
 				
 				
 					if singtile.x+tileSize > mouse[0] > singtile.x and singtile.y+tileSize > mouse[1] > singtile.y:
 						# print("laala")
-						highlightSingtile = tile(tileSize, singtile.x, singtile.y, gameDisp, "grasstilefaded.jpg")
+						highlightSingtile = tile(tileSize, singtile.x, singtile.y, gameDisp, path.join(imageDir,"grasstilefaded.jpg"))
 					else:
-						unhighlightSingtile = tile(tileSize, singtile.x, singtile.y, gameDisp, "grasstile.jpg")
+						unhighlightSingtile = tile(tileSize, singtile.x, singtile.y, gameDisp, path.join(imageDir,"grasstile.jpg"))
 				# # if singtile.hover():
 				# # 	# allHighlightedTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, "grasstilefaded.jpg"))
 
@@ -244,14 +406,14 @@ def startGameLoop():
 					# print("ct", currentTime, "st", singtile.startTime, "dif", currentTime-singtile.startTime )
 					if (currentTime-singtile.startTime)>1000 and (currentTime-singtile.startTime)//1000%3==0:
 						# print ("sxjsnj")
-						allPloughTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, "soil2.png", time))
+						allPloughTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, path.join(imageDir,"soil2.png"), time))
 						singtile.clickedTile=True
 						allFadedPloughTiles.remove(singtile)
 
 			if len(allPloughTiles)!=0:
 				for singtile in allPloughTiles:
 					# currentTime=pygame.time.get_ticks()
-				# print("ct", currentTime, "st", singtile.startTime, "dif", currentTime-singtile.startTime )
+					# print("ct", currentTime, "st", singtile.startTime, "dif", currentTime-singtile.startTime )
 					# if (currentTime-singtile.startTime)>1000 and (currentTime-singtile.startTime)//1000%3==0:
 					# print ("sxjsnj")
 
@@ -259,13 +421,16 @@ def startGameLoop():
 						print("clicked")
 						time=pygame.time.get_ticks()
 						if chosenCrop.y==cornY:
-							allSeedTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, "cornseeds.jpg", time))
+							allSeedTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, path.join(imageDir,"cornseeds.jpg"), time))
+							money-=10
 							allPloughTiles.remove(singtile)
 						if chosenCrop.y==tomatoY:
-							allSeedTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, "tomatoseeds.jpg", time))
+							allSeedTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, path.join(imageDir,"tomatoseeds.jpg"), time))
+							money-=15
 							allPloughTiles.remove(singtile)
 						if chosenCrop.y==cabbageY:
-							allSeedTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, "cabbageseeds.jpg", time))
+							allSeedTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, path.join(imageDir,"cabbageseeds.jpg"), time))
+							money-=20
 							allPloughTiles.remove(singtile)
 						
 
@@ -275,25 +440,247 @@ def startGameLoop():
 				# print("ct", currentTime, "st", singtile.startTime, "dif", currentTime-singtile.startTime )
 					# if (currentTime-singtile.startTime)>1000 and (currentTime-singtile.startTime)//1000%3==0:
 					# print ("sxjsnj")
+					centerX  = singtile.x+int(singtile.size/2)
+					centerY = singtile.y+int(singtile.size/2)
+					radius = int(singtile.size/4)
 
-					if (currentTime-singtile.startTime)>1000 and (currentTime-singtile.startTime)//1000%3==0:
+					if (currentTime-singtile.startTime)>1000: 
+						pygame.draw.circle(gameDisp, white, (centerX, centerY),radius)
+						
+					if (currentTime-singtile.startTime)>1000 and singtile.currentImg==path.join(imageDir,"cornseeds.jpg"): 	
+						
+						angle=int(((currentTime-singtile.startTime)//1000)/cornTime*360)
+						points = [(centerX, centerY)]
+						# angle = 
+						# Get points on arc
+						for i in range(-90,angle-90):
+							x = centerX + int(radius*math.cos(i*math.pi/180))
+							y = centerY+int(radius*math.sin(i*math.pi/180))
+							points.append((x, y))
+							# print ("n", i, "(x, y)", (x, y), "r", radius)
+						points.append((centerX, centerY))
+						
+						# Draw pie segment
+						if len(points) > 2:
+							pygame.draw.polygon(gameDisp, green, points)
+
+					if (currentTime-singtile.startTime)>1000 and singtile.currentImg==path.join(imageDir,"tomatoseeds.jpg"): 	
+						
+						angle=int(((currentTime-singtile.startTime)//1000)/tomatoTime*360)
+						points = [(centerX, centerY)]
+						# angle = 
+						# Get points on arc
+						for i in range(-90,angle-90):
+							x = centerX + int(radius*math.cos(i*math.pi/180))
+							y = centerY+int(radius*math.sin(i*math.pi/180))
+							points.append((x, y))
+							
+						points.append((centerX, centerY))
+						
+						# Draw pie segment
+						if len(points) > 2:
+							pygame.draw.polygon(gameDisp, green, points)
+
+					if (currentTime-singtile.startTime)>1000 and singtile.currentImg==path.join(imageDir,"cabbageseeds.jpg"): 	
+						
+						angle=int(((currentTime-singtile.startTime)//1000)/cabbageTime*360)
+						points = [(centerX, centerY)]
+						# angle = 
+						# Get points on arc
+						for i in range(-90,angle-90):
+							x = centerX + int(radius*math.cos(i*math.pi/180))
+							y = centerY+int(radius*math.sin(i*math.pi/180))
+							points.append((x, y))
+							
+						points.append((centerX, centerY))
+						
+						# Draw pie segment
+						if len(points) > 2:
+							pygame.draw.polygon(gameDisp, green, points)
+
+
+
+					if (currentTime-singtile.startTime)>10000 and (currentTime-singtile.startTime)//1000%cornTime==0:
+						
+						if singtile.currentImg==path.join(imageDir,"cornseeds.jpg"):
+							allCropTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, path.join(imageDir,"cornfield.jpg"), time))
+							allSeedTiles.remove(singtile)
+
+					if (currentTime-singtile.startTime)>10000 and (currentTime-singtile.startTime)//1000%tomatoTime==0:
+
+						if singtile.currentImg==path.join(imageDir,"tomatoseeds.jpg"):
+							allCropTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, path.join(imageDir,"tomatofield.jpg"), time))
+							allSeedTiles.remove(singtile)
+
+					if (currentTime-singtile.startTime)>10000 and (currentTime-singtile.startTime)//1000%cabbageTime==0:
+						
+						if singtile.currentImg==path.join(imageDir,"cabbageseeds.jpg"):
+							allCropTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, path.join(imageDir,"cabbagefield.jpg"), time))
+							allSeedTiles.remove(singtile)
+				
+
+			if len(allCropTiles)!=0:
+				for singtile in allCropTiles:
+
+					if singtile.clicked():
+						time=pygame.time.get_ticks()
+
+						if singtile.currentImg==path.join(imageDir,"cornfield.jpg") and not singtile.bugs:
+							money+=30
+						if singtile.currentImg==path.join(imageDir,"tomatofield.jpg")and not singtile.bugs:
+							money+=40
+						if singtile.currentImg==path.join(imageDir,"cabbagefield.jpg")and not singtile.bugs:
+							money+=50
+						allFadedPloughTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, path.join(imageDir,"soilfaded.png"), time))
+						allCropTiles.remove(singtile)
+
+			# randomInd=random.randint(len(allCropTiles)-1)
+
+			# randTile=allCropTiles[ranomInd]
+
+			if len(allCropTiles)!=0:
+				for singtile in allCropTiles:
+					currentTime=pygame.time.get_ticks()
+				# print("ct", currentTime, "st", singtile.startTime, "dif", currentTime-singtile.startTime )
+					# if (currentTime-singtile.startTime)>1000 and (currentTime-singtile.startTime)//1000%3==0:
+					# print ("sxjsnj")
+
+					randInt=random.randint(0,100)
+					if randInt==5:
+						singtile.bugs=True
+						if singtile.currentImg==path.join(imageDir,"cornfield.jpg"):
+							allBugTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, path.join(imageDir,"bugscornfield.png"), time))
+							allCropTiles.remove(singtile)
+						if singtile.currentImg==path.join(imageDir,"tomatofield.jpg"):
+							allBugTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, path.join(imageDir,"bugstomatofield.png"), time))
+							allCropTiles.remove(singtile)
+						if singtile.currentImg==path.join(imageDir,"cabbagefield.jpg"):
+							allBugTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, path.join(imageDir,"bugscabbagefield.png"), time))
+							allCropTiles.remove(singtile)
+
+
+
+					elif (currentTime-singtile.startTime)>1000 and (currentTime-singtile.startTime)//1000%30==0 and not singtile.bugs:
 						
 						
-						if singtile.currentImg=="cornseeds.jpg":
-							allCropTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, "cornfield.jpg", time))
-							allSeedTiles.remove(singtile)
-						if singtile.currentImg=="tomatoseeds.jpg":
-							allCropTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, "tomatofield.jpg", time))
-							allSeedTiles.remove(singtile)
-						if singtile.currentImg=="cabbageseeds.jpg":
-							allCropTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, "cabbagefield.jpg", time))
-							allSeedTiles.remove(singtile)
+						if singtile.currentImg==path.join(imageDir,"cornfield.jpg"):
+							allRottenTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, path.join(imageDir,"rottencornfield.png"), time))
+							allCropTiles.remove(singtile)
+						if singtile.currentImg==path.join(imageDir,"tomatofield.jpg"):
+							allRottenTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, path.join(imageDir,"rottentomatofield.png"), time))
+							allCropTiles.remove(singtile)
+						if singtile.currentImg==path.join(imageDir,"cabbagefield.jpg"):
+							allRottenTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, path.join(imageDir,"rottencabbagefield.png"), time))
+							allCropTiles.remove(singtile)
+
+
+			if len(allBugTiles)!=0:
+				for singtile in allBugTiles:
+		
+
+					if singtile.clicked():
 						
+						pestGameLoopExit=pestGameLoop()
+
+					
+						if pestGameLoopExit=="failed":
+							print(singtile.currentImg)
+
+							if singtile.currentImg==path.join(imageDir,"bugscornfield.png"):
+								allRottenTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, path.join(imageDir,"rottencornfield.png"), time))
+								allBugTiles.remove(singtile)
+								print("rotcorn")
+							if singtile.currentImg==path.join(imageDir,"bugstomatofield.png"):
+								allRottenTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, path.join(imageDir,"rottentomatofield.png"), time))
+								allBugTiles.remove(singtile)
+								print("rottom")
+							if singtile.currentImg==path.join(imageDir,"bugscabbagefield.png"):
+								allRottenTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, path.join(imageDir,"rottencabbagefield.png"), time))
+								allBugTiles.remove(singtile)
+								print("rotcab")
+						if pestGameLoopExit=="saved":
+							if singtile.currentImg==path.join(imageDir,"bugscornfield.png"):
+								allCropTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, path.join(imageDir,"cornfield.jpg"), time))
+								allBugTiles.remove(singtile)
+								print("corn")
+							if singtile.currentImg==path.join(imageDir,"bugstomatofield.png"):
+								allCropTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, path.join(imageDir,"tomatofield.jpg"), time))
+								allBugTiles.remove(singtile)
+								print("tom")
+							if singtile.currentImg==path.join(imageDir,"bugscabbagefield.png"):
+								print("cab")
+								allCropTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, path.join(imageDir,"cabbagefield.jpg"), time))
+								allBugTiles.remove(singtile)
+
 
 						
+			if len(allRottenTiles)!=0:
+				for singtile in allRottenTiles:
+
+					if singtile.clicked():
+						time=pygame.time.get_ticks()
+						money-=5
+						print("clicked")
+						allFadedPloughTiles.append(tile(tileSize, singtile.x, singtile.y, gameDisp, path.join(imageDir,"soilfaded.png"), time))
+						allRottenTiles.remove(singtile)
+			
+			if not upgradeHouse:
+				gameDisp.blit(scaledHouse2,(HouseX,0))
+			if upgradeHouse and not upgradeFarmhouse:
+				
+				gameDisp.blit(scaledHouse,(HouseX,0))
+			if  upgradeFarmhouse:
+				print("sjxnjs")
+				
+				gameDisp.blit(scaledHouse3,(HouseX,0))
+
+			if saveButton.clicked():
+				saveGameFile = shelve.open("%s" % username)
+				saveGameFile["allPloughTiles"] = allPloughTiles
+				saveGameFile["allGrassTiles"] = allGrassTiles
+				saveGameFile["money"] = money
+				saveGameFile["character"] = character
+				saveGameFile.close()
+				print("save")
+
+			if buyTree:
+				gameDisp.blit(scaledTree1,(HouseX/15-dispHeight/20,4*dispHeight/5-dispHeight/10))
+			if buyTree2:
+				gameDisp.blit(scaledTree1,(HouseX/10,4*dispHeight/5))
+
+			if buyBush:
+				gameDisp.blit(scaledbush,(HouseX+houseSize,4*dispHeight/5+dispHeight/10))
+			if buyBush2:
+				gameDisp.blit(scaledbush,(HouseX*2,4*dispHeight/5+dispHeight/10))
+
+
+			if soundOn:
+				gameDisp.blit(scaledSoundOn,(cropButX, 5*dispHeight/6))
+				
+			if not soundOn:
+		
+				gameDisp.blit(scaledSoundOff,(cropButX, 5*dispHeight/6))
+
+			if character=="f":
+				gameDisp.blit(scaledFarmgirl2,(0,cornY))
+			if character=="m":
+				gameDisp.blit(scaledFarmboy2,(0,cornY))
+				
+
+
+			gameDisp.blit(scaledTree2,(HouseX/10,3*dispHeight/5))
+			# gameDisp.blit(scaledTree1,(HouseX/15-dispHeight/20,4*dispHeight/5-dispHeight/10))
+			gameDisp.blit(scaledbush,(HouseX,4*dispHeight/5+dispHeight/10))
+			# gameDisp.blit(scaledTree1,(HouseX/10,4*dispHeight/5))
 			gameDisp.blit(scaledcorn,(cropButX,cornY))
 			gameDisp.blit(scaledcabbage,(cropButX,cabbageY))
 			gameDisp.blit(scaledtomato,(cropButX,tomatoY))
+			gameDisp.blit(scaledCoins,(0,0))
+			moneyText = myfont.render(" %d " % (money), 6, yellow)
+			pygame.draw.rect(gameDisp,backgroundGreen,(70,0,100,50))
+			gameDisp.blit(moneyText, (70, 20))
+
+			pygame.display.flip()
 			pygame.display.update()
 
 
@@ -301,13 +688,20 @@ def startGameLoop():
 def pestGameLoop():
 
 	running=True 
+	cropsFailed=None
+
+	contX=2*dispWidth/5
+	contY=3*dispHeight/5
+	contWidth = dispWidth/6
+	contHeight = dispHeight/8
+
 	bugSprites=pygame.sprite.Group()
 	playerSprite=pygame.sprite.GroupSingle()
 	# allSprites=pygame.sprite.Group()
 	spray = Spray()
 	playerSprite.add(spray)
 	# allSprites.add(spray)
-	myfont = pygame.font.SysFont("monospace", 15)
+	
 	numOfHits=0
 	counter=15
 	print(bugSprites)
@@ -347,7 +741,7 @@ def pestGameLoop():
 		playerSprite.update()
 		bugSprites.update()
 		#draw
-		gameDisp.fill(green)
+		gameDisp.fill(backgroundGreen)
 		playerSprite.draw(gameDisp)
 		bugSprites.draw(gameDisp)
 		# allSprites.draw(gameDisp)
@@ -358,36 +752,65 @@ def pestGameLoop():
 				print(((spray.rect.centerx-bug.rect.centerx)**2+(spray.rect.centery-bug.rect.centery)**2)**0.5)
 
 				if bug.direction=="top":
-					print("top")
+					
 					bug.speedY=-8
 				if bug.direction=="bottom":
-					print("bottom")
+					
 					bug.speedY=+8
 				if bug.direction=="left":
-					print("left")
+					
 					bug.speedY=-8
 				if bug.direction=="right":
-					print("right")
+					
 					bug.speedY=+8
 
 
-		# 
-		# counter=counter-(time-//1000
 
-		if numOfHits==16:
+		if numOfHits>=10:
+			gameDisp.fill(backgroundGreen)
 			winText= myfont.render("Crops Saved!", 6, yellow)
 			gameDisp.blit(winText, (200, 200))
+			continueButton = Button(blue, contX, contY, contWidth,contHeight, gameDisp)
+			continueButton.addText("Continue", white)
+			cropsFailed=False
+			for bug in bugSprites:
+				bug.kill()
 
+			if continueButton.clicked():
+				if not cropsFailed:
+					print("saved")
+					return "saved"
 
-		elif counter==0 and numOfHits!=16:
+		elif counter==0 and numOfHits<10:
+			gameDisp.fill(backgroundGreen)
 			loseText= myfont.render("Crops Failed!", 6, yellow)
 			gameDisp.blit(loseText, (200, 200))
+			continueButton = Button(blue, contX, contY, contWidth,contHeight, gameDisp)
+			continueButton.addText("Continue", white)
+			cropsFailed=True
+			for bug in bugSprites:
+				bug.kill()
+			
+			if continueButton.clicked():
+				if cropsFailed:
+					print("failed")
+					return "failed"
+			
+			# if continueButton.clicked():
+			# 	if not cropsFailed:
+			# 		return "saved"
+			# if cropsFailed:
+			# 	return "failed"
+
+
 		
 
 
 		# render text
 		timerText = myfont.render("Timer: %d seconds" % (counter), 6, yellow)
-		gameDisp.blit(timerText, (100, 100))
+		gameDisp.blit(timerText, (0, 20))
+		scoreText = myfont.render("Score: %d" % (numOfHits), 6, yellow)
+		gameDisp.blit(scoreText, (2*dispWidth/3, 20))
 		#flip display
 		pygame.display.flip()
 

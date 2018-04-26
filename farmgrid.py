@@ -19,22 +19,8 @@ class tile:
 		self.surface.blit(scaleImage, (0,0))
 		self.screen=screen
 		self.screen.blit(self.surface,(self.x,self.y))
-		self.clickedTile=False
+		self.bugs=False
 
-
-		# self.currentImg = "grasstile.jpg"
-		# img=pygame.image.load(self.currentImg)
-		# scaleImage=pygame.transform.scale(img,(size,size))
-		# self.surface= pygame.Surface((size,size))
-		# self.surface.blit(scaleImage, (0,0))
-		# self.screen=screen
-		# self.screen.blit(self.surface,(self.x,self.y))
-
-		# self.grass=pygame.image.load("grasstile.jpg")
-		# self.highlightGrass=pygame.image.load("grasstile.jpg")
-		# self.soil=pygame.image.load("soil.png")
-		# self.plough=pygame.image.load("soil2.png")
-		# self.fadedPlough=pygame.image.load("soilfaded.png")
 
 	def __repr__(self):
 		return ("x= %d y= %d startTime=" % (self.x, self.y))

@@ -89,25 +89,6 @@ class Bugs(pygame.sprite.Sprite):
 				self.rect.y=random.randint(-int(dispWidth/2),-self.rect.width)
 				self.speedX=random.randint(-3,3)
 				self.speedY=8	
-		# if self.direction=="top" and self.rect.y>dispHeight+self.rect.height:
-		# 	self.rect.x=random.randint(0,dispWidth-self.rect.width)
-		# 	self.rect.y=random.randint(-int(dispHeight/2),-self.rect.height)
-		# 	self.speedX=random.randint(-3,3)
-		# 	self.speedY=8
-		# if self.direction=="bottom" and self.rect.y<(-self.rect.height):
-		# 	self.rect.x=random.randint(0,dispWidth-self.rect.width)
-		# 	self.rect.y=random.randint(self.rect.height+dispHeight,int(dispHeight*1.5))
-		# 	self.speedX=random.randint(-3,3)
-		# 	self.speedY=-8
-		# if self.direction=="right" and self.rect.x<(-self.rect.width):
-		# 	self.rect.y=random.randint(0,dispHeight-self.rect.height)
-		# 	self.rect.x=random.randint(self.rect.width+dispWidth,int(dispWidth*1.5))
-		# 	self.speedX=-8
-		# 	self.speedY=random.randint(-3,3)
-		# if self.direction=="left" and self.rect.x>dispWidth+self.rect.width:
-		# 	self.rect.x=random.randint(0,dispHeight-self.rect.height)
-		# 	self.rect.y=random.randint(-int(dispWidth/2),-self.rect.width)
-		# 	self.speedX=random.randint(-3,3)
-		# 	self.speedY=8	
+	
 		
 		
