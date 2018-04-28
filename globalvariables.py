@@ -26,7 +26,7 @@ pygame.init()
 pygame.mixer.init()
 pygame.display.set_caption("Farmville")
 myfont = pygame.font.SysFont("monospace", 50)
-myfont2 = pygame.font.SysFont("monospace", 30)
+myfont2 = pygame.font.SysFont("monospace", 23)
 
 white=(255,255,255)
 brightGreen=(0,255,0)
@@ -119,5 +119,9 @@ scaledSoundOn=pygame.transform.scale(soundOn,(coinSize,coinSize))
 
 soundOff=pygame.image.load(path.join(imageDir,"soundoff.png"))
 scaledSoundOff=pygame.transform.scale(soundOff,(coinSize,coinSize))	
+
+speech=pygame.image.load(path.join(imageDir,"speech.png"))
+scaledSpeech=pygame.transform.scale(speech,(int(4*houseSize/3),houseSize))	
+
 
 

@@ -15,26 +15,24 @@ import timer
 introLoopExit = introLoop()
 
 
-if introLoopExit==1:
+# if introLoopExit==username:
 	
-	characterLoopExit= characterLoop()
+characterLoopExit= characterLoop(introLoopExit)
 
-	if characterLoopExit== "f":
+startGameLoopExit=startGameLoop(characterLoopExit)
 
-		startGameLoopExit=startGameLoop("f")
+	# if startGameLoopExit=="bug":
 
-		# if startGameLoopExit=="bug":
+	# 	pestGameLoopExit=pestGameLoop()
 
-		# 	pestGameLoopExit=pestGameLoop()
+	# 	if pestGameLoopExit=="ruined":
 
-		# 	if pestGameLoopExit=="ruined":
-
-		# 		startGameLoopExit=startGameLoop("f")
+	# 		startGameLoopExit=startGameLoop("f")
 
 
-	else:		
+# else:		
 
-		startGameLoopExit=startGameLoop("m")
+# 	startGameLoopExit=startGameLoop("m")
 
 
 

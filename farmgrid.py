@@ -13,12 +13,12 @@ class tile:
 		self.y = y
 		self.highlight=False
 		self.currentImg = currentImg
-		img=pygame.image.load(self.currentImg)
-		scaleImage=pygame.transform.scale(img,(size,size))
-		self.surface= pygame.Surface((size,size))
-		self.surface.blit(scaleImage, (0,0))
+		# img=pygame.image.load(self.currentImg)
+		# scaleImage=pygame.transform.scale(img,(self.size,self.size))
+		# self.surface= pygame.Surface((self.size,self.size))
+		# self.surface.blit(scaleImage, (0,0))
 		self.screen=screen
-		self.screen.blit(self.surface,(self.x,self.y))
+		
 		self.bugs=False
 
 
@@ -47,6 +47,13 @@ class tile:
 				self.highlight=True
 			if self.highlight:
 				tile(tileSize, singtile.x, singtile.y, gameDisp, "grasstilefaded.jpg")
+
+	def draw(self):
+		img=pygame.image.load(self.currentImg)
+		scaleImage=pygame.transform.scale(img,(self.size,self.size))
+		self.surface= pygame.Surface((self.size,self.size))
+		self.surface.blit(scaleImage, (0,0))
+		self.screen.blit(self.surface,(self.x,self.y))
 
 
 
