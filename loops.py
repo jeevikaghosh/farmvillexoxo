@@ -29,9 +29,17 @@ def introLoop():
 	userHeight=dispHeight/10
 	welcomeTextX=dispWidth/7
 	
+	# theme=pygame.mixer.Sound(path.join(soundDir,"farmtheme.ogg"))
+	theme.play()
+	theme.set_volume(0.1)
+	# pygame.mixer.Sound(path.join(soundDir,"farmtheme.ogg")).set_volume(0.1)
+	
+	
 	username=""
 
 	while running: 
+		# print(theme)
+		# theme
 		for event in pygame.event.get():
 			if event.type== pygame.QUIT:
 				return 0
@@ -87,8 +95,8 @@ def introLoop():
 						mylist = [line.rstrip('\n') for line in file]
 						character=mylist[0]
 						file.close()
-
-					startGameLoop((character,username), True)
+					theme.stop()
+					return startGameLoop((character,username), True)
     				# running=False
 				# invalidText = myfont.render("!!!Invalid Username!!!", 6, red)
 				# gameDisp.blit(invalidText, (userButX+20, userButY+70))
@@ -152,13 +160,16 @@ def characterLoop(username):
 
 			if 	maleCharButton.clicked():
 				maleButClicked=True
+
 				character="m"
 
 			if maleButClicked:
 				highlightmaleCharButton = Button(brightBlue,maleCharButX,charButY,charButWidth,CharButHeight,gameDisp)
+				theme.stop()
 				return ((character, username))
 			if femButClicked:
 				highlightmaleCharButton = Button(brightPink,femCharButX,charButY,charButWidth,CharButHeight,gameDisp)
+				theme.stop()
 				return ((character, username))
 
 			
@@ -189,6 +200,10 @@ def startGameLoop(specs, load=False):
 	buyTree2=False
 	buyBush=False
 	buyBush2=False
+
+	coinsForTree=None
+	coinsForBush=None
+	coinsForHouse=None
 	print("game",username, character)
 	
 	written=[]
@@ -227,15 +242,13 @@ def startGameLoop(specs, load=False):
 	saveButY=dispHeight/15
 
 
-
-
-
 	cornButton = Button(red,cropButX,cornY,cropButWidth,cropButHeight,gameDisp)
 	
 	cabbageButton = Button(red,cropButX,cabbageY,cropButWidth,cropButHeight,gameDisp)
 	
 	tomatoButton = Button(red,cropButX,tomatoY,cropButWidth,cropButHeight,gameDisp)
 	
+	background.play()
 
 	cropButtons.append(cornButton)
 	cropButtons.append(cabbageButton)
@@ -266,37 +279,33 @@ def startGameLoop(specs, load=False):
 			if mylist[4]=="2":
 				upgradeHouse=True
 				upgradeFarmhouse=True
+
+			loadGrassTiles=[]
+			loadPloughTiles=[]
+			for i in range(margin,numOfTiles*tileSize,tileSize):
+				for j in range(margin,numOfTiles*tileSize-tileSize,tileSize):
+					
+					if ("x= %d y= %d" % (i , j)) in mylist[5]:
+						newGrassTile = tile(tileSize, i+cameraX, j+cameraY, gameDisp, path.join(imageDir,"grasstile.jpg"))
+						loadGrassTiles.append(newGrassTile)
+
+			for i in range(margin,numOfTiles*tileSize,tileSize):
+				for j in range(margin,numOfTiles*tileSize-tileSize,tileSize):
+					
+					if ("x= %d y= %d" % (i , j)) in mylist[6]:
+						newPloughTile = tile(tileSize, i+cameraX, j+cameraY, gameDisp, path.join(imageDir,"soil2.png"))
+						loadPloughTiles.append(newPloughTile)
+			print(loadGrassTiles)
+			allPloughTiles=loadPloughTiles
+			allGrassTiles=loadGrassTiles
+
 			
         	# character =  file [1]
         # file.close()
 
 	while running: 
 
-			for event in pygame.event.get():
-				if event.type == pygame.QUIT:
-					running=False
-
-				if event.type==pygame.KEYDOWN:
-					if event.key==pygame.K_UP:
-						cameraDir='n'
-					elif event.key==pygame.K_DOWN:
-						cameraDir='s'
-					elif event.key==pygame.K_RIGHT:
-						cameraDir='e'
-					elif event.key==pygame.K_LEFT:
-						cameraDir='w'
-				elif event.type==pygame.KEYUP:
-					cameraDir=None
-
-			if cameraDir=='n':
-				cameraY-=20
-			elif cameraDir=='s':
-				cameraY+=20
-			elif cameraDir=='e':
-				cameraX+=20
-			elif cameraDir=='w':
-				cameraX-=20
-
+		
 			screenButton=Button(backgroundGreen,0,0,dispWidth,dispHeight,gameDisp)
 
 			if len(allGrassTiles)!=0:
@@ -331,66 +340,92 @@ def startGameLoop(specs, load=False):
 				for singtile in allBugTiles: 
 					singtile.draw()
 
-			
-			
-
-			houseButton = Button(backgroundGreen,HouseX,0,houseSize*2,houseSize,gameDisp)
-			treeButton = Button(backgroundGreen,0,2*dispHeight/3-50,houseSize,houseSize,gameDisp)
-			bushButton = Button(backgroundGreen,HouseX,7*dispHeight/8,houseSize,houseSize,gameDisp)
-			farmerButton=Button(backgroundGreen,0,dispHeight/3,houseSize,houseSize-60,gameDisp)
-
 			saveButton = Button(blue, saveButX, saveButY, 2*cropButWidth/3,cropButHeight, gameDisp)
 			visitButton = Button(blue, saveButX+2*cropButWidth/3+30, saveButY, 2*cropButWidth/3,cropButHeight, gameDisp)
 			soundButton = Button(backgroundGreen, cropButX, 5*dispHeight/6, cropButWidth,cropButHeight, gameDisp)
 			saveButton.addText("Save", white)
 			visitButton.addText("Visit", white)
 
+			
+			houseButton = Button(backgroundGreen,HouseX,0,houseSize*2,houseSize,gameDisp)
+			treeButton = Button(backgroundGreen,0,2*dispHeight/3-50,houseSize,houseSize,gameDisp)
+			bushButton = Button(backgroundGreen,HouseX,7*dispHeight/8,houseSize,houseSize,gameDisp)
+			farmerButton=Button(backgroundGreen,0,dispHeight/3,houseSize,houseSize-60,gameDisp)
+
+			
 			mouse = pygame.mouse.get_pos()
 
-			if houseButton.hover():
-				upgradeText = myfont2.render("Upgrade House for 100 coins", 6, black)
-				gameDisp.blit(upgradeText, (HouseX*2,0))
-			else:
-				pygame.draw.rect(gameDisp,backgroundGreen,(HouseX*2,0,400,30))
+			if money>=100:
+				coinsForHouse=True
+			elif money<100:
+				coinsForHouse=False
+			if money>=50:
+				coinsForTree=True
+			elif money<50:
+				coinsForTree=False
+			if money>=30:
+				coinsForBush=True
+			elif money<30:
+				coinsForBush=False
+			if money==0:
+				return "Game Over"
 
+				running=False
+
+			
 			if houseButton.clicked():
-				
-				# if money>50:
+				if money>=100:
 					if upgradeHouse:
 						upgradeFarmhouse=True
 					upgradeHouse=True
-					if upgradeHouse and not upgradeFarmhouse:
-						money-=100
+					
+					money-=100
+				else:
+					noMoneyText = myfont2.render("Not enough coins", 6, red)
+					gameDisp.blit(noMoneyText, (HouseX*2,0))
+
 
 			if treeButton.clicked():
 				
-				# if money>50:
+				if money>=50:
 					if buyTree:
 						buyTree2=True
 					buyTree=True
 					
-					money-=20
+					money-=50
+				else:
+					noMoneyText = myfont2.render("Not enough coins", 6, red)
+					gameDisp.blit(noMoneyText, (HouseX/15,dispHeight/2+20))
 
 			if bushButton.clicked():
 				
-				# if money>50:
+				if money>=30:
 					if buyBush:
 						buyBush2=True
 					buyBush=True
 					
-					money-=20
+					money-=30
 
+				else:
+					noMoneyText = myfont2.render("Not enough coins", 6, red)
+					gameDisp.blit(noMoneyText, (HouseX/2+20,dispHeight-50))
 
+			if houseButton.hover():
+				if (not upgradeHouse or not upgradeFarmhouse) and coinsForHouse:
+					upgradeText = myfont2.render("Upgrade House for 100 coins", 6, black)
+					gameDisp.blit(upgradeText, (HouseX*2,0))
+			else:
+				pygame.draw.rect(gameDisp,backgroundGreen,(HouseX*2,0,400,30))
 
 
 
 			if bushButton.hover():
+				if (not buyBush or not buyBush2) and coinsForBush:
+					upgradeText = myfont2.render("Buy another Bush", 6, black)
+					upgradeText2 = myfont2.render("for 30 coins", 6, black)
+					gameDisp.blit(upgradeText, (HouseX/2+20,dispHeight-50))
+					gameDisp.blit(upgradeText2, (HouseX/2+20,dispHeight-30))
 				
-				upgradeText = myfont2.render("Buy another Bush", 6, black)
-				upgradeText2 = myfont2.render("for 20 coins", 6, black)
-				gameDisp.blit(upgradeText, (HouseX/2+20,dispHeight-50))
-				gameDisp.blit(upgradeText2, (HouseX/2+20,dispHeight-30))
-			
 			else:
 
 				pygame.draw.rect(gameDisp,backgroundGreen,(HouseX/2+20,dispHeight-50,120,300))
@@ -398,11 +433,11 @@ def startGameLoop(specs, load=False):
 		
 
 			if treeButton.hover():
-				
-				upgradeText = myfont2.render("Buy another Tree", 6, black)
-				upgradeText2 = myfont2.render("for 20 coins", 6, black)
-				gameDisp.blit(upgradeText, (HouseX/15,dispHeight/2+20))
-				gameDisp.blit(upgradeText2, (HouseX/15,4*dispHeight/7))
+				if (not buyTree or not buyTree2) and coinsForTree:
+					upgradeText = myfont2.render("Buy another Tree", 6, black)
+					upgradeText2 = myfont2.render("for 50 coins", 6, black)
+					gameDisp.blit(upgradeText, (HouseX/15,dispHeight/2+20))
+					gameDisp.blit(upgradeText2, (HouseX/15,4*dispHeight/7))
 			else:
 
 				pygame.draw.rect(gameDisp,backgroundGreen,(HouseX/15,dispHeight/2,130,300))
@@ -416,10 +451,12 @@ def startGameLoop(specs, load=False):
 			if soundButton.clicked():
 					print("smxk")
 					if not soundOn:
+						background.play()
 						soundOn=True
 					elif soundOn:
 						soundOn=False
-
+						background.stop()
+						
 			if saveButton.clicked():
 				numOfTrees=0
 				numOfBushes=0
@@ -439,7 +476,7 @@ def startGameLoop(specs, load=False):
 				if upgradeHouse and upgradeFarmhouse:
 					houseUpgrades=2
 
-				written=[character, str(money), str(numOfTrees),  str(numOfTrees), str(houseUpgrades), str(allGrassTiles), str(allCropTiles)]
+				written=[character, str(money), str(numOfTrees),  str(numOfBushes), str(houseUpgrades), str(allGrassTiles), str(allPloughTiles)]
 				print(written)
 				newFile = ""
 				for elem in written:
@@ -448,6 +485,8 @@ def startGameLoop(specs, load=False):
 				with open("%s.txt" %(username), 'w') as file:
 					file.write(newFile)
 					file.close()
+
+			# if visitButton.clicked():
 
 
 			if saveButton.hover():
@@ -597,7 +636,7 @@ def startGameLoop(specs, load=False):
 								money-=20
 								allPloughTiles.remove(singtile)
 						except:
-							noCropText = myfont.render("No crop Chosen!" , 6, black)
+							noCropText = myfont2.render("No crop Chosen!" , 6, red)
 							gameDisp.blit(noCropText, (cropButX-50,cornY-30))
 
 						
@@ -797,7 +836,7 @@ def startGameLoop(specs, load=False):
 			gameDisp.blit(scaledSpeech,( HouseX/17+cameraX,dispHeight/2-250+cameraY))
 			upgradeText = myfont2.render("Welcome %s!" %username, 6, black)
 			upgradeText2 = myfont2.render(" Press H for help" , 6, black)
-			upgradeText3 = myfont2.render("and I for instructions", 6, black)
+			upgradeText3 = myfont2.render("and I for information", 6, black)
 			gameDisp.blit(upgradeText, (HouseX/4+cameraX,dispHeight/2-220+cameraY))
 			gameDisp.blit(upgradeText2, (HouseX/5+cameraX,4*dispHeight/7-240+cameraY))
 			gameDisp.blit(upgradeText3, (HouseX/6+cameraX,4*dispHeight/7-220+cameraY))
@@ -814,6 +853,41 @@ def startGameLoop(specs, load=False):
 			pygame.draw.rect(gameDisp,backgroundGreen,(70,0,100,50))
 			gameDisp.blit(moneyText, (70, 20))
 			
+			for event in pygame.event.get():
+				if event.type == pygame.QUIT:
+					running=False
+
+				if event.type==pygame.KEYDOWN:
+					if event.key==pygame.K_UP:
+						cameraDir='n'
+					elif event.key==pygame.K_DOWN:
+						cameraDir='s'
+					elif event.key==pygame.K_RIGHT:
+						cameraDir='e'
+					elif event.key==pygame.K_LEFT:
+						cameraDir='w'
+					# if event.key==pygame.K_h:
+					# 	print("h")
+					# 	gameDisp.blit(scaledInstructions, (0,0))
+
+				elif event.type==pygame.KEYUP:
+					
+					cameraDir=None
+
+			if pygame.key.get_pressed()[pygame.K_h]:
+						gameDisp.blit(scaledInstructions, (0,0))
+			if pygame.key.get_pressed()[pygame.K_i]:
+						gameDisp.blit(scaledInformation, (0,0))
+
+
+			if cameraDir=='n':
+				cameraY-=20
+			elif cameraDir=='s':
+				cameraY+=20
+			elif cameraDir=='e':
+				cameraX+=20
+			elif cameraDir=='w':
+				cameraX-=20
 
 			pygame.display.update()
 
@@ -937,17 +1011,7 @@ def pestGameLoop():
 		if not gameState and not cropsFailed:
 			return "saved"
 
-			# if continueButton.clicked():
-			# 	if not cropsFailed:
-			# 		return "saved"
-			# if cropsFailed:
-			# 	return "failed"
 
-
-		
-
-
-		# render text
 		timerText = myfont.render("Timer: %d seconds" % (counter), 6, yellow)
 		gameDisp.blit(timerText, (0, 20))
 		scoreText = myfont.render("Score: %d" % (numOfHits), 6, yellow)
@@ -959,10 +1023,56 @@ def pestGameLoop():
 
 
 
+def gameOverLoop():
+	running=True
 
+	logoX=dispWidth/5
+	logoY=dispHeight/6-50
+	startWidth = dispWidth/5
+	startHeight = dispHeight/7
+	startX=2*dispWidth/5
+	StartY=4*dispHeight/5
+	usernameY=2*dispHeight/5
+	userButY=3*dispHeight/5-50
+	userButX=dispWidth/5+50
+	userWidth=dispWidth/2
+	userHeight=dispHeight/10
+	welcomeTextX=dispWidth/7
+	
+	while running:
+		
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				running= False
+		
+		gameDisp.fill(white)
 
+		gameDisp.blit(scaledLogo,(logoX,logoY))
+		welcomeText = myfont.render("Game Over!!!" , 6, black)
+		gameDisp.blit(welcomeText, (2*dispWidth/5-50, dispHeight/2))
+		endButton = Button(green,startX-150,StartY,startWidth,startHeight,gameDisp)
+		endButton.addText("Quit Game", black)
+		restartButton = Button(green,startX+150,StartY,startWidth,startHeight,gameDisp)
+		restartButton.addText("Restart", black)
 
+		if restartButton.hover():
+				highlightrestartButton = Button(brightGreen,startX+150,StartY,startWidth,startHeight,gameDisp)
+				highlightrestartButton.addText("Restart", black)
+		else:
+			restartButton=Button(green,startX+150,StartY,startWidth,startHeight,gameDisp)
+			restartButton.addText("Restart", black)
 
+		if endButton.hover():
+				highlightendButton = Button(brightGreen,startX-150,StartY,startWidth,startHeight,gameDisp)
+				highlightendButton.addText("Quit Game", black)
+		else:
+			endButton=Button(green,startX-150,StartY,startWidth,startHeight,gameDisp)
+			endButton.addText("Quit Game", black)
 
+		if restartButton.clicked():
+			return "restart"
 
+		if endButton.clicked():
+			running=False
 
+		pygame.display.flip()

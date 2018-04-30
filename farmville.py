@@ -15,11 +15,19 @@ import timer
 introLoopExit = introLoop()
 
 
-# if introLoopExit==username:
 	
 characterLoopExit= characterLoop(introLoopExit)
 
 startGameLoopExit=startGameLoop(characterLoopExit)
+
+if startGameLoopExit=="Game Over":
+
+	gameOverLoopExit=gameOverLoop()
+
+	if gameOverLoopExit=="restart":
+
+		introLoopExit = introLoop()
+
 
 	# if startGameLoopExit=="bug":
 

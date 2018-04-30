@@ -13,7 +13,9 @@ gameDisp=pygame.display.set_mode((dispWidth,dispHeight))
 
 imageDir = path.join(path.dirname(__file__), 'image')
 
+soundDir = path.join(path.dirname(__file__), 'audio')
 
+userDir = path.join(path.dirname(__file__), 'users')
 
 keyDict = {48:"0", 49:"1", 50:"2", 51:"3", 52:"4", 53:"5", 54:"6", 55:"7", 56 :"8", 57:"9", 
 97:"a", 98:"b", 99:"c", 100:"d", 101:"e", 102:"f", 103:"g", 104:"h", 105:"i",  106:"j",  107:"k", 
@@ -41,7 +43,18 @@ orangeRed=(255,140,0)
 red=(255,69,0)
 yellow=(255,255,0)
 
-
+logoX=dispWidth/5
+logoY=dispHeight/6-50
+startWidth = dispWidth/5
+startHeight = dispHeight/7
+startX=2*dispWidth/5
+StartY=4*dispHeight/5
+usernameY=2*dispHeight/5
+userButY=3*dispHeight/5-50
+userButX=dispWidth/5+50
+userWidth=dispWidth/2
+userHeight=dispHeight/10
+welcomeTextX=dispWidth/7
 
 cameraX=0
 cameraY=0
@@ -60,7 +73,9 @@ treeSize=int(dispWidth/6)
 bugSize=int(dispWidth/20)
 coinSize=int(dispWidth/10)
 
+theme=pygame.mixer.Sound(path.join(soundDir,"farmtheme.ogg"))
 
+background=pygame.mixer.Sound(path.join(soundDir,"farmbackground.ogg"))
 
 logo=pygame.image.load(path.join(imageDir,"farm112logo.png"))
 scaledLogo=pygame.transform.scale(logo,(int(dispWidth/2),int(dispHeight/5)))
@@ -76,7 +91,6 @@ scaledHouse3=pygame.transform.scale(house3,(houseSize*2,houseSize))
 
 bush=pygame.image.load(path.join(imageDir,"bushflower.png"))
 scaledbush=pygame.transform.scale(bush,(int(houseSize),int(houseSize/2)))	
-
 
 tree1=pygame.image.load(path.join(imageDir,"tree2.png"))
 scaledTree1=pygame.transform.scale(tree1,(treeSize,treeSize))	
@@ -103,13 +117,11 @@ farmboy=pygame.image.load(path.join(imageDir,"farmboy.png"))
 scaledFarmboy=pygame.transform.scale(farmboy,(int(dispWidth/3),int(dispHeight/2-dispHeight/15)))
 scaledFarmboy2=pygame.transform.scale(farmboy,(int(dispWidth/6),int(dispHeight/4-dispHeight/15)))
 
-
 spray=pygame.image.load(path.join(imageDir,"spray.png"))
 scaledSpray=pygame.transform.scale(spray,(treeSize,treeSize))	
 
 bug=pygame.image.load(path.join(imageDir,"bug.png"))
 scaledBug=pygame.transform.scale(bug,(bugSize,bugSize))	
-
 
 coins=pygame.image.load(path.join(imageDir,"coins.png"))
 scaledCoins=pygame.transform.scale(coins,(coinSize,coinSize))
@@ -123,5 +135,8 @@ scaledSoundOff=pygame.transform.scale(soundOff,(coinSize,coinSize))
 speech=pygame.image.load(path.join(imageDir,"speech.png"))
 scaledSpeech=pygame.transform.scale(speech,(int(4*houseSize/3),houseSize))	
 
+instructions=pygame.image.load(path.join(imageDir,"instructions.png"))
+scaledInstructions=pygame.transform.scale(instructions,(dispWidth,dispHeight))	
 
-
+information=pygame.image.load(path.join(imageDir,"cropinfo.png"))
+scaledInformation=pygame.transform.scale(information,(dispWidth,dispHeight))	
