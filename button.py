@@ -32,10 +32,8 @@ class Button:
 
 	def hover(self):
 		mouse = pygame.mouse.get_pos()
-		# click = pygame.mouse.get_pressed()
 		return self.x+self.width > mouse[0] > self.x and self.y+self.height > mouse[1] > self.y
-		# if self.x+self.width > mouse[0] > self.x and self.y+self.height > mouse[1] > self.y:
-		# 	self.color=self.highlight
+	
 	def clicked(self):
 		mouse = pygame.mouse.get_pos()
 		click = pygame.mouse.get_pressed()

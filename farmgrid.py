@@ -6,19 +6,14 @@ from globalvariables import *
 class tile:
 
 	def __init__(self,size, x, y, screen, currentImg, startTime=None):
-		# self.tileStatus = "empty"
+	
 		self.startTime=startTime
 		self.size = size
 		self.x = x
 		self.y = y
 		self.highlight=False
 		self.currentImg = currentImg
-		# img=pygame.image.load(self.currentImg)
-		# scaleImage=pygame.transform.scale(img,(self.size,self.size))
-		# self.surface= pygame.Surface((self.size,self.size))
-		# self.surface.blit(scaleImage, (0,0))
 		self.screen=screen
-		
 		self.bugs=False
 
 
@@ -26,7 +21,6 @@ class tile:
 		return ("x= %d y= %d startTime=" % (self.x, self.y))
 
 	def clicked(self):
-
 		mouse = pygame.mouse.get_pos()
 		click = pygame.mouse.get_pressed()
 		return self.x+self.size > mouse[0] > self.x and self.y+self.size > mouse[1] > self.y and click[0]==1

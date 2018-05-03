@@ -9,19 +9,20 @@ username = ""
 dispWidth=750
 dispHeight=600
 gameDisp=pygame.display.set_mode((dispWidth,dispHeight))
-# clock=pygame.time.clock()
 
+#directory variables
 imageDir = path.join(path.dirname(__file__), 'image')
 
 soundDir = path.join(path.dirname(__file__), 'audio')
 
-userDir = path.join(path.dirname(__file__), 'users')
 
+#dict of letters
 keyDict = {48:"0", 49:"1", 50:"2", 51:"3", 52:"4", 53:"5", 54:"6", 55:"7", 56 :"8", 57:"9", 
 97:"a", 98:"b", 99:"c", 100:"d", 101:"e", 102:"f", 103:"g", 104:"h", 105:"i",  106:"j",  107:"k", 
 108:"l", 109:"m", 110:"n", 111:"o", 112:"p", 113:"q", 114:"r", 115:"s", 116:"t", 117:"u", 118:"v",
 119:"w", 120:"x", 121:"y",  122:"z",}
-1 # pygame.K_2:"2", pygame.K_3:"3", pygame.K_4:"4", pygame.K_5:"5", pygame.K_6:"6", pygame.K_7:"7",pygame.K_8:"8", pygame.K_9:"9", pygame.K_a:"a", pygame.K_b:"b", pygame.K_c:"c",pygame.K_d:"d", pygame.K_e:"e", pygame.K_f:"f", pygame.K_g:"g", pygame.K_h:"h", pygame.K_i:"i", pygame.K_j:"j", pygame.K_k:"k", pygame.K_l:"l", pygame.K_m:"m", pygame.K_n:"n", pygame.K_o:"o", pygame.K_p:"p",pygame.K_q:"q", pygame.K_r:"r", pygame.K_s:"s", pygame.K_t:"t", pygame.K_u:"u", pygame.K_v:"v", pygame.K_w:"w", pygame.K_x:"x" pygame.K_y:"y", pygame.K_z:"z" }
+
+#initialising all of pygames modules
 pygame.init()
 pygame.font.init()
 pygame.init()
@@ -30,6 +31,7 @@ pygame.display.set_caption("Farmville")
 myfont = pygame.font.SysFont("monospace", 50)
 myfont2 = pygame.font.SysFont("monospace", 23)
 
+#defining colors
 white=(255,255,255)
 brightGreen=(0,255,0)
 green = (50,205,50)
@@ -43,6 +45,7 @@ orangeRed=(255,140,0)
 red=(255,69,0)
 yellow=(255,255,0)
 
+#making position variables for all the image placements 
 logoX=dispWidth/5
 logoY=dispHeight/6-50
 startWidth = dispWidth/5
@@ -55,7 +58,38 @@ userButX=dispWidth/5+50
 userWidth=dispWidth/2
 userHeight=dispHeight/10
 welcomeTextX=dispWidth/7
+charButY=dispHeight/4
+charButWidth=dispWidth/3
+CharButHeight=dispHeight/2
+maleCharButX=dispWidth/12
+femCharButX=3*dispWidth/5-dispWidth/25
+margin=dispHeight/30
+cropButWidth = dispWidth/7
+cropButHeight = dispHeight/8
+cropButX=4.5*dispWidth/5
+cornY=dispHeight/5+dispHeight/20
+cabbageY=2*dispHeight/5+dispHeight/20
+tomatoY=3*dispHeight/5+dispHeight/20
+HouseX=dispWidth/3
+saveButX=4*dispWidth/5-40
+saveButY=dispHeight/15
+contX=2*dispWidth/5-40
+contY=3*dispHeight/5
+contWidth = dispWidth/3
+contHeight = dispHeight/8
+friendY1=2*dispHeight/5-50
+friendY2=3*dispHeight/5
+friendX1=dispWidth/5-70
+friendX2=2*dispWidth/5+10
+friendX3=4*dispWidth/5-70
+friendButHeight=dispHeight/10
+friendButHeigth=dispHeight/10
+houseSize=int(dispWidth/5)
+treeSize=int(dispWidth/6)
+bugSize=int(dispWidth/20)
+coinSize=int(dispWidth/10)
 
+#camera and other random variables
 cameraX=0
 cameraY=0
 cameraDir=None
@@ -64,14 +98,9 @@ character=None
 chosenCrop=None
 cornTime=10
 tomatoTime=20
-cabbageTime=35
+cabbageTime=30
 
-
-
-houseSize=int(dispWidth/5)
-treeSize=int(dispWidth/6)
-bugSize=int(dispWidth/20)
-coinSize=int(dispWidth/10)
+#loading and scaling the images for future use
 
 theme=pygame.mixer.Sound(path.join(soundDir,"farmtheme.ogg"))
 
@@ -98,7 +127,6 @@ scaledTree1=pygame.transform.scale(tree1,(treeSize,treeSize))
 tree2=pygame.image.load(path.join(imageDir,"tree3.png"))
 scaledTree2=pygame.transform.scale(tree2,(treeSize,treeSize))	
 
-
 corn=pygame.image.load(path.join(imageDir,"corn.png"))
 scaledcorn=pygame.transform.scale(corn,(int(dispWidth/10),int(dispHeight/8)))	
 
@@ -107,7 +135,6 @@ scaledcabbage=pygame.transform.scale(cabbage,(int(dispWidth/10),int(dispHeight/8
 
 tomato=pygame.image.load(path.join(imageDir,"tomato.png"))
 scaledtomato=pygame.transform.scale(tomato,(int(dispWidth/10),int(dispHeight/8)))
-
 
 farmgirl=pygame.image.load(path.join(imageDir,"farmgirl.jpg"))
 scaledFarmgirl=pygame.transform.scale(farmgirl,(int(dispWidth/3),int(dispHeight/2)))
@@ -140,3 +167,7 @@ scaledInstructions=pygame.transform.scale(instructions,(dispWidth,dispHeight))
 
 information=pygame.image.load(path.join(imageDir,"cropinfo.png"))
 scaledInformation=pygame.transform.scale(information,(dispWidth,dispHeight))	
+
+farmtheme=pygame.image.load(path.join(imageDir,"farmtheme.jpg"))
+scaledfarmtheme=pygame.transform.scale(farmtheme,(dispWidth,dispHeight))	
+

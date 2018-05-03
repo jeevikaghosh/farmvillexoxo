@@ -21,7 +21,7 @@ class Spray(pygame.sprite.Sprite):
 
 		self.moveX=0
 		self.moveY=0
-		
+		#the movement of the spray
 		pressedKey=pygame.key.get_pressed()
 		if pressedKey[pygame.K_LEFT]:
 			self.moveX=-self.speed
@@ -42,6 +42,7 @@ class Bugs(pygame.sprite.Sprite):
 		self.direction=direction
 		self.image=image
 		self.rect=self.image.get_rect()
+		#direction of movent of the bugs according to their assigned direction
 		if self.direction=="top":
 			self.rect.x=random.randint(0,dispWidth-self.rect.width)
 			self.rect.y=random.randint(-int(dispHeight/2),-self.rect.height)
@@ -63,10 +64,12 @@ class Bugs(pygame.sprite.Sprite):
 			self.speedX=random.randint(-3,3)
 			self.speedY=8
 
+   
 	def update(self):
 		self.rect.x+=self.speedX
 		self.rect.y+=self.speedY
 
+		#changing the direction if the bugs go outside the court
 		if (self.rect.y>dispHeight+self.rect.height or self.rect.y<(-self.rect.height) or 
 			self.rect.x<(-self.rect.width) or self.rect.x>dispWidth+self.rect.width):
 			if self.direction=="top":

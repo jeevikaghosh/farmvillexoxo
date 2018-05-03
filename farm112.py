@@ -8,40 +8,29 @@ from loops import *
 from globalvariables import *
 from pestgame import *
 import timer
+from os import path 
 
 
-
-
+#starts the games loops in order of progression
 introLoopExit = introLoop()
 
-
-	
 characterLoopExit= characterLoop(introLoopExit)
 
 startGameLoopExit=startGameLoop(characterLoopExit)
 
 if startGameLoopExit=="Game Over":
 
-	gameOverLoopExit=gameOverLoop()
-
-	if gameOverLoopExit=="restart":
-
-		introLoopExit = introLoop()
+	pygame.quit()
+	sys.exit()
 
 
-	# if startGameLoopExit=="bug":
+elif startGameLoopExit=="restart":
 
-	# 	pestGameLoopExit=pestGameLoop()
+	introLoopExit = introLoop()
 
-	# 	if pestGameLoopExit=="ruined":
+	characterLoopExit= characterLoop(introLoopExit)
 
-	# 		startGameLoopExit=startGameLoop("f")
-
-
-# else:		
-
-# 	startGameLoopExit=startGameLoop("m")
-
+	startGameLoopExit=startGameLoop(characterLoopExit)
 
 
 
